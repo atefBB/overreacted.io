@@ -14,6 +14,7 @@ import {
   codeToLanguage,
   createLanguageLink,
   loadFontsForCode,
+  replaceAnchorLinksByLanguage,
 } from '../utils/i18n';
 
 const GITHUB_USERNAME = 'gaearon';
@@ -67,16 +68,20 @@ class Translations extends React.Component {
               ))}
             </span>
           )}
-          {lang !== 'en' && lang !== 'ru' && (
+          {lang !== 'en' && (
             <>
               <br />
               <br />
-              <Link to={languageLink('en')}>Read the original</Link>
-              {' • '}
-              <a href={editUrl} target="_blank" rel="noopener noreferrer">
-                Improve this translation
-              </a>
-              {' • '}
+              {lang !== 'ru' && (
+                <>
+                  <Link to={languageLink('en')}>Read the original</Link>
+                  {' • '}
+                  <a href={editUrl} target="_blank" rel="noopener noreferrer">
+                    Improve this translation
+                  </a>
+                  {' • '}
+                </>
+              )}
               <Link to={`/${lang}`}>View all translated posts</Link>{' '}
             </>
           )}
@@ -101,6 +106,11 @@ class BlogPostTemplate extends React.Component {
 
     // Replace original links with translated when available.
     let html = post.html;
+
+    // Replace original anchor links by lang when available in whitelist
+    // see utils/whitelist.js
+    html = replaceAnchorLinksByLanguage(html, lang);
+
     translatedLinks.forEach(link => {
       // jeez
       function escapeRegExp(str) {
@@ -185,7 +195,7 @@ class BlogPostTemplate extends React.Component {
               fontFamily: systemFont,
             }}
           >
-            <Signup />
+            <Signup cta={post.frontmatter.cta} />
           </div>
           <h3
             style={{
@@ -217,7 +227,11 @@ class BlogPostTemplate extends React.Component {
             >
               <li>
                 {previous && (
-                  <Link to={previous.fields.slug} rel="prev">
+                  <Link
+                    to={previous.fields.slug}
+                    rel="prev"
+                    style={{ marginRight: 20 }}
+                  >
                     ← {previous.frontmatter.title}
                   </Link>
                 )}
@@ -255,6 +269,7 @@ export const pageQuery = graphql`
         title
         date(formatString: "MMMM DD, YYYY")
         spoiler
+        cta
       }
       fields {
         slug

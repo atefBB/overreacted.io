@@ -2,6 +2,7 @@
 title: React as a UI Runtime
 date: '2019-02-02'
 spoiler: An in-depth description of the React programming model.
+cta: 'react'
 ---
 
 Most tutorials introduce React as a UI library. This makes sense because React *is* a UI library. That’s literally what the tagline says!
@@ -22,7 +23,7 @@ I’ve written about the challenges of creating [user interfaces](/the-elements-
 
 It’s aimed at experienced programmers and folks working on other UI libraries who asked about some tradeoffs chosen in React. I hope you’ll find it useful!
 
-**Many people successfully use React for years without thinking about most of these topics.** This is definitely a programmer-centric view of React rather than, say, a [designer-centric one](http://mrmrs.cc/writing/2016/04/21/developing-ui/). But I don’t think it hurts to have resources for both.
+**Many people successfully use React for years without thinking about most of these topics.** This is definitely a programmer-centric view of React rather than, say, a [designer-centric one](http://mrmrs.cc/writing/developing-ui/). But I don’t think it hurts to have resources for both.
 
 With that disclaimer out of the way, let’s go!
 
@@ -64,7 +65,7 @@ React renderers can work in one of two modes.
 
 The vast majority of renderers are written to use the “mutating” mode. This mode is how the DOM works: we can create a node, set its properties, and later add or remove children from it. The host instances are completely mutable.
 
-React can also work in a “persistent” mode. This mode is for host environments that don’t provide methods like `appendChild()` but instead clone the parent tree and always replace the top-level child. Immutability on the host tree level makes multi-threading easier. [React Fabric](https://facebook.github.io/react-native/blog/2018/06/14/state-of-react-native-2018) takes advantage of that.
+React can also work in a [“persistent”](https://en.wikipedia.org/wiki/Persistent_data_structure) mode. This mode is for host environments that don’t provide methods like `appendChild()` but instead clone the parent tree and always replace the top-level child. Immutability on the host tree level makes multi-threading easier. [React Fabric](https://facebook.github.io/react-native/blog/2018/06/14/state-of-react-native-2018) takes advantage of that.
 
 As a React user, you never need to think about these modes. I only want to highlight that React isn’t just an adapter from one mode to another. Its usefulness is orthogonal to the target low-level view API paradigm.
 
@@ -290,7 +291,7 @@ dialogNode.appendChild(newInputNode);
 
 This is not great because *conceptually* the `<input>` hasn’t been *replaced* with `<p>` — it just moved. We don’t want to lose its selection, focus state, and content due to re-creating the DOM.
 
-While this problem has an easy fix (which we’ll get to in a minute), it doesn’t occur often in the React applications. It’s interesting to see why.
+While this problem has an easy fix (which we’ll get to in a minute), it doesn’t occur often in React applications. It’s interesting to see why.
 
 In practice, you would rarely call `ReactDOM.render` directly. Instead, React apps tend to be broken down into functions like this:
 
@@ -811,10 +812,10 @@ The `setState` calls in components wouldn’t immediately cause a re-render. Ins
 Batching is good for performance but can be surprising if you write code like:
 
 ```jsx
-  const [count, setCounter] = useState(0);
+  const [count, setCount] = useState(0);
 
   function increment() {
-    setCounter(count + 1);
+    setCount(count + 1);
   }
 
   function handleClick() {
@@ -827,10 +828,10 @@ Batching is good for performance but can be surprising if you write code like:
 If we start with `count` set to `0`, these would just be three `setCount(1)` calls. To fix this, `setState` provides an overload that accepts an “updater” function:
 
 ```jsx
-  const [count, setCounter] = useState(0);
+  const [count, setCount] = useState(0);
 
   function increment() {
-    setCounter(c => c + 1);
+    setCount(c => c + 1);
   }
 
   function handleClick() {
